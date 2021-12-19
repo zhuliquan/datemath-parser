@@ -16,25 +16,28 @@ you can click [here](http://www.elasticsearch.org/guide/en/elasticsearch/referen
 | m   | Minutes |
 | s   | Seconds |
 
-Here are some samples: 
+Here are some samples:
 `now+1h`, `now+1h+1m`, `now+1h/d`, `2012-01-01||+1M/d`.
 
 Note, when doing range type searches, and the upper value is inclusive, the rounding will properly be rounded to the ceiling instead of flooring it.
 
 ## Usage
 
-Returns an int64 representing timestamp in milliseconds
+Returns a `time.Time` struct object, which store utc time.
 ```golang
 package main
 
 import (
     "fmt"
-    "github.com/zhuliquan/datemath-parser"
+    "github.com/zhuliquan/datemath_parser"
 )
 
 func main() {
-    
-
-    
+    var parser = datemath_parser.NewDataMathParser()
+    if t, err := parser.Parse("now+7M/d"); err != nil {
+        fmt.Println(err)
+    } else {
+        fmt.Println(t)
+    } 
 }
 ```

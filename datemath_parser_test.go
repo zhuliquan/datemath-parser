@@ -55,7 +55,7 @@ func TestDateMathParser_evalDur(t *testing.T) {
 		t.Run(eachCase.name, func(t *testing.T) {
 			if o, e := p.evalDur(eachCase.in, time.Unix(0, 0)); e != eachCase.err {
 				t.Errorf("expect get err: %+v, but get err: %+v", eachCase.err, e)
-			} else if o != eachCase.out {
+			} else if o.UnixNano()/1000 != eachCase.out {
 				t.Errorf("expect get res: %+v, but get res: %+v", eachCase.out, o)
 			}
 		})

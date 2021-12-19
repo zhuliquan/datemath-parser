@@ -10,14 +10,50 @@ import (
 
 type DateMathParserOption func(*DateMathParser) error
 
+func changeTimeFormat(format string) (string, error) {
+	if strings.Index(format, "ww") != -1 ||
+		strings.Index(format, "xxxx") != -1 ||
+		strings.Index(format, "DDD") != -1 {
+		return "", fmt.Errorf("doesn't support xxxx/ww/DDD")
+	}
+	format = strings.ReplaceAll(format, "yyyy", "2006")
+	format = strings.ReplaceAll(format, "YYYY", "2006")
+	format = strings.ReplaceAll(format, "yy", "06")
+	format = strings.ReplaceAll(format, "YY", "06")
+	format = strings.ReplaceAll(format, "MM", "05")
+	format = strings.ReplaceAll(format, "dd", "04")
+	format = strings.ReplaceAll(format, "HH", "03")
+	format = strings.ReplaceAll(format, "mm", "02")
+	format = strings.ReplaceAll(format, "ss", "01")
+	format = strings.ReplaceAll(format, "e", "Mon")
+	format = strings.ReplaceAll(format, "am", "pm")
+	format = strings.ReplaceAll(format, "AM", "PM")
+	format = strings.ReplaceAll(format, ".SSSSSSSSS", ".000000000")
+	format = strings.ReplaceAll(format, ".SSSSSSSS", ".00000000")
+	format = strings.ReplaceAll(format, ".SSSSSSS", ".0000000")
+	format = strings.ReplaceAll(format, ".SSSSSS", ".000000")
+	format = strings.ReplaceAll(format, ".SSSSS", ".00000")
+	format = strings.ReplaceAll(format, ".SSSS", ".0000")
+	format = strings.ReplaceAll(format, ".SSS", ".000")
+	format = strings.ReplaceAll(format, ".SS", ".00")
+	format = strings.ReplaceAll(format, ".S", ".0")
+	return format, nil
+}
+
 func WithFormat(formats []string) DateMathParserOption {
 	return func(p *DateMathParser) error {
 		var resF = []string{}
 		for _, format := range formats {
 			if builtInFormat[format] != nil {
-				resF = append(resF, builtInFormat[format]...)
+				for _, bf := range builtInFormat[format] {
+					if bf, err := changeTimeFormat(bf); err == nil {
+						resF = append(resF, bf)
+					}
+				}
 			} else {
-				resF = append(resF, format)
+				if format, err := changeTimeFormat(format); err == nil {
+					resF = append(resF, format)
+				}
 			}
 		}
 		p.Formats = resF

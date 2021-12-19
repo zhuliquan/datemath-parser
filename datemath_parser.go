@@ -12,6 +12,8 @@ import (
 
 var durRegexp, _ = regexp.Compile(`([\+-]\d*|\/)(y|M|w|d|h|H|m|s)`)
 
+var emptyTime = time.Unix(0, 0)
+
 var units = map[string]time.Duration{
 	"y": time.Hour * 365 * 24,
 	"M": time.Hour * 30 * 24,
@@ -24,15 +26,21 @@ var units = map[string]time.Duration{
 }
 
 type DateMathParser struct {
-	Format   string
-	TimeZone string
+	Formats  []string
+	TimeZone *time.Location
 }
 
-func NewDateMathParser() *DateMathParser {
-	return &DateMathParser{}
+func NewDateMathParser(opts ...DateMathParserOption) (*DateMathParser, error) {
+	var p = &DateMathParser{}
+	for _, opt := range opts {
+		if err := opt(p); err != nil {
+			return nil, err
+		}
+	}
+	return p, nil
 }
 
-func (p *DateMathParser) Parse(expr string) (int64, error) {
+func (p *DateMathParser) Parse(expr string) (time.Time, error) {
 	var res time.Time
 	var dur = ""
 	if expr[0:3] == "now" {
@@ -44,17 +52,17 @@ func (p *DateMathParser) Parse(expr string) (int64, error) {
 		if sep == -1 {
 			dur = ""
 			if res, err = p.parseTime(expr); err != nil {
-				return 0, err
+				return emptyTime, err
 			}
 		} else {
 			dur = expr[sep+2:]
 			if res, err = p.parseTime(expr[:sep]); err != nil {
-				return 0, err
+				return emptyTime, err
 			}
 		}
 	}
 	if dur == "" {
-		return res.UnixNano() / 1000, nil
+		return res, nil
 	} else {
 		return p.evalDur(dur, res)
 	}
@@ -62,14 +70,33 @@ func (p *DateMathParser) Parse(expr string) (int64, error) {
 }
 
 func (p *DateMathParser) parseTime(expr string) (time.Time, error) {
-	return dateparse.ParseAny(expr)
+	if len(p.Formats) != 0 {
+		for _, format := range p.Formats {
+			if p.TimeZone != nil {
+				if tim, err := time.ParseInLocation(format, expr, p.TimeZone); err == nil {
+					return tim, nil
+				}
+			} else {
+				if tim, err := time.Parse(format, expr); err == nil {
+					return tim, nil
+				}
+			}
+		}
+		return emptyTime, fmt.Errorf("failed to parse time, expr: %s, format: %+v", expr, p.Formats)
+	} else {
+		if p.TimeZone != nil {
+			return dateparse.ParseIn(expr, p.TimeZone)
+		}
+		return dateparse.ParseAny(expr)
+	}
+
 }
 
-func (p *DateMathParser) evalDur(dur string, tim time.Time) (int64, error) {
+func (p *DateMathParser) evalDur(dur string, tim time.Time) (time.Time, error) {
 	var res = tim
 	for _, s := range durRegexp.FindAllStringSubmatch(dur, -1) {
 		if len(s) != 3 {
-			return 0, fmt.Errorf(`expect match expression: ([\+-]\d*|\/)(y|M|w|d|h|H|m|s)`)
+			return emptyTime, fmt.Errorf(`expect match expression: ([\+-]\d*|\/)(y|M|w|d|h|H|m|s)`)
 		}
 		if s[1] == "/" {
 			res = res.Round(units[s[2]])
@@ -85,5 +112,5 @@ func (p *DateMathParser) evalDur(dur string, tim time.Time) (int64, error) {
 			res = res.Add(time.Duration(d) * units[s[2]])
 		}
 	}
-	return res.UnixNano() / 1000, nil
+	return res, nil
 }

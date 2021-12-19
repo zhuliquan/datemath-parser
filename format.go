@@ -8,12 +8,10 @@ var builtInFormat = map[string][]string{
 	// A formatter for the number of seconds since the epoch.
 	// Note, that this timestamp is subject to the limits of a Java Long.MIN_VALUE and Long.
 	// MAX_VALUE divided by 1000 (the number of milliseconds in a second).
-	// date_optional_time or strict_date_optional_time
-	// A generic ISO datetime parser, where the date must include the year at a minimum,
-	// and the time (separated by T), is optional. Examples: yyyy-MM-ddTHH:mm:ss.SSSZ or yyyy-MM-dd.
 	"epoch_second": {"epoch_second"},
 
 	// A generic ISO datetime parser, where the date must include the year at a minimum, and the time (separated by T), is optional. The fraction of a second part has a nanosecond resolution. Examples: yyyy-MM-ddTHH:mm:ss.SSSSSSZ or yyyy-MM-dd.
+	"date_optional_time":              {"yyyy-MM-ddTHH:mm:ss.SSSSSSZ", "yyyy-MM-dd"},
 	"strict_date_optional_time_nanos": {"yyyy-MM-ddTHH:mm:ss.SSSSSSZ", "yyyy-MM-dd"},
 
 	// A basic formatter for a full date as four digit year, two digit month of year, and two digit day of month: yyyyMMdd.
