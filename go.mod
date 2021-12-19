@@ -1,4 +1,4 @@
-module github.com/zhuliquan/datemath-parser
+module github.com/zhuliquan/datemath_parser
 
 go 1.14
 
