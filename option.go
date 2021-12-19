@@ -16,6 +16,8 @@ func WithFormat(formats []string) DateMathParserOption {
 		for _, format := range formats {
 			if builtInFormat[format] != nil {
 				resF = append(resF, builtInFormat[format]...)
+			} else {
+				resF = append(resF, format)
 			}
 		}
 		p.Formats = resF
