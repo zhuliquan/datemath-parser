@@ -11,9 +11,9 @@ import (
 type DateMathParserOption func(*DateMathParser) error
 
 func changeTimeFormat(format string) (string, error) {
-	if strings.Index(format, "ww") != -1 ||
-		strings.Index(format, "xxxx") != -1 ||
-		strings.Index(format, "DDD") != -1 {
+	if !strings.Contains(format, "ww") ||
+		!strings.Contains(format, "xxxx") ||
+		!strings.Contains(format, "DDD") {
 		return "", fmt.Errorf("doesn't support xxxx/ww/DDD")
 	}
 	format = strings.ReplaceAll(format, "yyyy", "2006")
@@ -61,7 +61,7 @@ func WithFormat(formats []string) DateMathParserOption {
 	}
 }
 
-var TimeZoneOffset, _ = regexp.Compile("(\\+|-)(\\d+):(\\d+)")
+var TimeZoneOffset = regexp.MustCompile(`(\+|-)(\d+):(\d+)`)
 
 func WithTimeZone(timeZone string) DateMathParserOption {
 	return func(p *DateMathParser) error {
