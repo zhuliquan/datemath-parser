@@ -45,7 +45,7 @@ func (p *DateMathParser) Parse(expr string) (time.Time, error) {
 	var dur = ""
 	if expr[0:3] == "now" {
 		dur = expr[3:]
-		res = time.Now().UTC()
+		res = time.Now()
 	} else {
 		var sep = strings.Index(expr, "||")
 		var err error
@@ -61,6 +61,7 @@ func (p *DateMathParser) Parse(expr string) (time.Time, error) {
 			}
 		}
 	}
+	res = res.UTC()
 	if dur == "" {
 		return res, nil
 	} else {

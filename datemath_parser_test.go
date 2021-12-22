@@ -1,6 +1,7 @@
 package datemath_parser
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -198,28 +199,28 @@ func TestDateMathParser_Parse(t *testing.T) {
 			name:    "TestDateMathParser_Parse01",
 			p:       &DateMathParser{},
 			args:    args{expr: "1640183392||+h/d"},
-			want:    time.Unix(1640183392+3600, 0).Round(time.Hour * 24),
+			want:    time.Unix(1640183392+3600, 0).UTC().Round(time.Hour * 24),
 			wantErr: false,
 		},
 		{
 			name:    "TestDateMathParser_Parse02",
 			p:       &DateMathParser{},
 			args:    args{expr: "1640183392001||+h/d"},
-			want:    time.Unix(1640183392+3600, 1000000).Round(time.Hour * 24),
+			want:    time.Unix(1640183392+3600, 1000000).UTC().Round(time.Hour * 24),
 			wantErr: false,
 		},
 		{
 			name:    "TestDateMathParser_Parse03",
 			p:       &DateMathParser{TimeZone: time.Local},
 			args:    args{expr: "2021-12-22||+h+M/d"},
-			want:    time.Unix(1640102400+3600+3600*24*30, 0).Round(time.Hour * 24),
+			want:    time.Unix(1640102400+3600+3600*24*30, 0).UTC().Round(time.Hour * 24),
 			wantErr: false,
 		},
 		{
 			name:    "TestDateMathParser_Parse04",
 			p:       &DateMathParser{TimeZone: time.Local},
 			args:    args{expr: "2021-12-22T10:09:00||+h+M/d"},
-			want:    time.Unix(1640138940+3600+3600*24*30, 0).Round(time.Hour * 24),
+			want:    time.Unix(1640138940+3600+3600*24*30, 0).UTC().Round(time.Hour * 24),
 			wantErr: false,
 		},
 		{
@@ -227,6 +228,13 @@ func TestDateMathParser_Parse(t *testing.T) {
 			p:       &DateMathParser{TimeZone: time.UTC},
 			args:    args{expr: "now/s"},
 			want:    time.Now().UTC().Round(time.Second),
+			wantErr: false,
+		},
+		{
+			name:    "TestDateMathParser_Parse06",
+			p:       &DateMathParser{TimeZone: time.Local},
+			args:    args{expr: "2021-12-22T10:09:00"},
+			want:    time.Unix(1640138940, 0).UTC(),
 			wantErr: false,
 		},
 	}
@@ -237,6 +245,7 @@ func TestDateMathParser_Parse(t *testing.T) {
 				t.Errorf("DateMathParser.parseTime() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+			fmt.Println(got)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DateMathParser.parseTime() = %v, want %v", got, tt.want)
 			}
