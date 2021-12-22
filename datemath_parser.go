@@ -72,24 +72,37 @@ func (p *DateMathParser) Parse(expr string) (time.Time, error) {
 func (p *DateMathParser) parseTime(expr string) (time.Time, error) {
 	if len(p.Formats) != 0 {
 		for _, format := range p.Formats {
-			if p.TimeZone != nil {
-				if tim, err := time.ParseInLocation(format, expr, p.TimeZone); err == nil {
-					return tim, nil
+			if format == "epoch_second" || format == "epoch_millis" {
+				if _, err := strconv.Atoi(expr); err == nil {
+					if tim, err := p.parseAny(expr); err == nil {
+						return tim, nil
+					}
 				}
 			} else {
-				if tim, err := time.Parse(format, expr); err == nil {
+				if tim, err := p.parseFormat(expr, format); err == nil {
 					return tim, nil
 				}
 			}
 		}
 		return emptyTime, fmt.Errorf("failed to parse time, expr: %s, format: %+v", expr, p.Formats)
 	} else {
-		if p.TimeZone != nil {
-			return dateparse.ParseIn(expr, p.TimeZone)
-		}
-		return dateparse.ParseAny(expr)
+		return p.parseAny(expr)
 	}
+}
 
+func (p *DateMathParser) parseFormat(expr, format string) (time.Time, error) {
+	if p.TimeZone != nil {
+		return time.ParseInLocation(format, expr, p.TimeZone)
+	} else {
+		return time.Parse(format, expr)
+	}
+}
+
+func (p *DateMathParser) parseAny(expr string) (time.Time, error) {
+	if p.TimeZone != nil {
+		return dateparse.ParseIn(expr, p.TimeZone)
+	}
+	return dateparse.ParseAny(expr)
 }
 
 func (p *DateMathParser) evalDur(dur string, tim time.Time) (time.Time, error) {
