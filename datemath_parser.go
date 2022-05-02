@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/araddon/dateparse"
+	"github.com/vjeantet/jodaTime"
 )
 
 var durRegexp, _ = regexp.Compile(`([\+-]\d*|\/)(y|M|w|d|h|H|m|s)`)
@@ -73,11 +74,17 @@ func (p *DateMathParser) Parse(expr string) (time.Time, error) {
 func (p *DateMathParser) parseTime(expr string) (time.Time, error) {
 	if len(p.Formats) != 0 {
 		for _, format := range p.Formats {
-			if format == "epoch_second" || format == "epoch_millis" {
-				if _, err := strconv.Atoi(expr); err == nil {
-					if tim, err := p.parseAny(expr); err == nil {
-						return tim, nil
-					}
+			if format == "epoch_second" {
+				if sec, err := strconv.ParseInt(expr, 10, 64); err != nil {
+					return emptyTime, fmt.Errorf("failed to parse time, expr: %s, format: epoch_second", expr)
+				} else {
+					return time.Unix(sec, 0), nil
+				}
+			} else if format == "epoch_millis" {
+				if millis, err := strconv.ParseInt(expr, 10, 64); err != nil {
+					return emptyTime, fmt.Errorf("failed to parse time, expr: %s, format: epoch_millis", expr)
+				} else {
+					return time.Unix(millis/1000, millis%1000), nil
 				}
 			} else {
 				if tim, err := p.parseFormat(expr, format); err == nil {
@@ -93,9 +100,9 @@ func (p *DateMathParser) parseTime(expr string) (time.Time, error) {
 
 func (p *DateMathParser) parseFormat(expr, format string) (time.Time, error) {
 	if p.TimeZone != nil {
-		return time.ParseInLocation(format, expr, p.TimeZone)
+		return jodaTime.ParseInLocation(format, expr, p.TimeZone.String())
 	} else {
-		return time.Parse(format, expr)
+		return jodaTime.Parse(format, expr)
 	}
 }
 
