@@ -11,7 +11,7 @@ import (
 	"github.com/vjeantet/jodaTime"
 )
 
-var durRegexp, _ = regexp.Compile(`([\+-]\d*|\/)(y|M|w|d|h|H|m|s)`)
+var durRegexp = regexp.MustCompile(`([\+-]\d*|\/)(y|M|w|d|h|H|m|s)`)
 
 var emptyTime = time.Unix(0, 0)
 
@@ -115,10 +115,11 @@ func (p *DateMathParser) parseAny(expr string) (time.Time, error) {
 
 func (p *DateMathParser) evalDur(dur string, tim time.Time) (time.Time, error) {
 	var res = tim
-	for _, s := range durRegexp.FindAllStringSubmatch(dur, -1) {
-		if len(s) != 3 {
-			return emptyTime, fmt.Errorf(`expect match expression: ([\+-]\d*|\/)(y|M|w|d|h|H|m|s)`)
-		}
+	var allMatch = durRegexp.FindAllStringSubmatch(dur, -1)
+	if len(allMatch) == 0 {
+		return emptyTime, fmt.Errorf(`expect match expression: ([\+-]\d*|\/)(y|M|w|d|h|H|m|s)`)
+	}
+	for _, s := range allMatch {
 		if s[1] == "/" {
 			res = res.Round(units[s[2]])
 		} else {
