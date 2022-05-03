@@ -10,8 +10,10 @@ var builtInFormat = map[string][]string{
 	// MAX_VALUE divided by 1000 (the number of milliseconds in a second).
 	"epoch_second": {"epoch_second"},
 
+	// A generic ISO datetime parser, where the date must include the year at a minimum, and the time (separated by T), is optional. Examples: yyyy-MM-dd'T'HH:mm:ss.SSSZ or yyyy-MM-dd.
+	"date_optional_time":              {"yyyy-MM-ddTHH:mm:ss.SSSZ", "yyyy-MM-dd"},
+	"strict_date_optional_time":       {"yyyy-MM-ddTHH:mm:ss.SSSZ", "yyyy-MM-dd"},
 	// A generic ISO datetime parser, where the date must include the year at a minimum, and the time (separated by T), is optional. The fraction of a second part has a nanosecond resolution. Examples: yyyy-MM-ddTHH:mm:ss.SSSSSSZ or yyyy-MM-dd.
-	"date_optional_time":              {"yyyy-MM-ddTHH:mm:ss.SSSSSSZ", "yyyy-MM-dd"},
 	"strict_date_optional_time_nanos": {"yyyy-MM-ddTHH:mm:ss.SSSSSSZ", "yyyy-MM-dd"},
 
 	// A basic formatter for a full date as four digit year, two digit month of year, and two digit day of month: yyyyMMdd.
@@ -80,13 +82,13 @@ var builtInFormat = map[string][]string{
 	"date_hour_minute_second_millis":        {"yyyy-MM-ddTHH:mm:ss.SSS"},
 	"strict_date_hour_minute_second_millis": {"yyyy-MM-ddTHH:mm:ss.SSS"},
 
-	// A formatter that combines a full date and time, separated by a T: yyyy-MM-ddTHH:mm:ss.SSSZZ.
-	"date_time":        {"yyyy-MM-ddTHH:mm:ss.SSSZZ"},
-	"strict_date_time": {"yyyy-MM-ddTHH:mm:ss.SSSZZ"},
+	// A formatter that combines a full date and time, separated by a T: yyyy-MM-ddTHH:mm:ss.SSSZ.
+	"date_time":        {"yyyy-MM-ddTHH:mm:ss.SSSZ"},
+	"strict_date_time": {"yyyy-MM-ddTHH:mm:ss.SSSZ"},
 
-	// A formatter that combines a full date and time without millis, separated by a T: yyyy-MM-ddTHH:mm:ssZZ.
-	"date_time_no_millis":        {"yyyy-MM-ddTHH:mm:ssZZ"},
-	"strict_date_time_no_millis": {"yyyy-MM-ddTHH:mm:ssZZ"},
+	// A formatter that combines a full date and time without millis, separated by a T: yyyy-MM-ddTHH:mm:ssZ.
+	"date_time_no_millis":        {"yyyy-MM-ddTHH:mm:ssZ"},
+	"strict_date_time_no_millis": {"yyyy-MM-ddTHH:mm:ssZ"},
 
 	// A formatter for a two digit hour of day: HH
 	"hour":        {"HH"},
@@ -112,41 +114,41 @@ var builtInFormat = map[string][]string{
 	"ordinal_date":        {"yyyy-DDD"},
 	"strict_ordinal_date": {"yyyy-DDD"},
 
-	// A formatter for a full ordinal date and time, using a four digit year and three digit dayOfYear: yyyy-DDDTHH:mm:ss.SSSZZ.
-	"ordinal_date_time":        {"yyyy-DDDTHH:mm:ss.SSSZZ"},
-	"strict_ordinal_date_time": {"yyyy-DDDTHH:mm:ss.SSSZZ"},
+	// A formatter for a full ordinal date and time, using a four digit year and three digit dayOfYear: yyyy-DDDTHH:mm:ss.SSSZ.
+	"ordinal_date_time":        {"yyyy-DDDTHH:mm:ss.SSSZ"},
+	"strict_ordinal_date_time": {"yyyy-DDDTHH:mm:ss.SSSZ"},
 
-	// A formatter for a full ordinal date and time without millis, using a four digit year and three digit dayOfYear: yyyy-DDDTHH:mm:ssZZ.
-	"ordinal_date_time_no_millis":        {"yyyy-DDDTHH:mm:ssZZ"},
-	"strict_ordinal_date_time_no_millis": {"yyyy-DDDTHH:mm:ssZZ"},
+	// A formatter for a full ordinal date and time without millis, using a four digit year and three digit dayOfYear: yyyy-DDDTHH:mm:ssZ.
+	"ordinal_date_time_no_millis":        {"yyyy-DDDTHH:mm:ssZ"},
+	"strict_ordinal_date_time_no_millis": {"yyyy-DDDTHH:mm:ssZ"},
 
-	// A formatter for a two digit hour of day, two digit minute of hour, two digit second of minute, three digit fraction of second, and time zone offset: HH:mm:ss.SSSZZ.
-	"time":        {"HH:mm:ss.SSSZZ"},
-	"strict_time": {"HH:mm:ss.SSSZZ"},
+	// A formatter for a two digit hour of day, two digit minute of hour, two digit second of minute, three digit fraction of second, and time zone offset: HH:mm:ss.SSSZ.
+	"time":        {"HH:mm:ss.SSSZ"},
+	"strict_time": {"HH:mm:ss.SSSZ"},
 
-	// A formatter for a two digit hour of day, two digit minute of hour, two digit second of minute, and time zone offset: HH:mm:ssZZ.
-	"time_no_millis":        {"HH:mm:ssZZ"},
-	"strict_time_no_millis": {"HH:mm:ssZZ"},
+	// A formatter for a two digit hour of day, two digit minute of hour, two digit second of minute, and time zone offset: HH:mm:ssZ.
+	"time_no_millis":        {"HH:mm:ssZ"},
+	"strict_time_no_millis": {"HH:mm:ssZ"},
 
-	// A formatter for a two digit hour of day, two digit minute of hour, two digit second of minute, three digit fraction of second, and time zone offset prefixed by T: THH:mm:ss.SSSZZ.
-	"t_time":        {"THH:mm:ss.SSSzz"},
-	"strict_t_time": {"THH:mm:ss.SSSzz"},
+	// A formatter for a two digit hour of day, two digit minute of hour, two digit second of minute, three digit fraction of second, and time zone offset prefixed by T: THH:mm:ss.SSSZ.
+	"t_time":        {"THH:mm:ss.SSSZ"},
+	"strict_t_time": {"THH:mm:ss.SSSZ"},
 
-	// A formatter for a two digit hour of day, two digit minute of hour, two digit second of minute, and time zone offset prefixed by T: THH:mm:ssZZ.
-	"t_time_no_millis":        {"THH:mm:ssZZ"},
-	"strict_t_time_no_millis": {"THH:mm:ssZZ"},
+	// A formatter for a two digit hour of day, two digit minute of hour, two digit second of minute, and time zone offset prefixed by T: THH:mm:ssZ.
+	"t_time_no_millis":        {"THH:mm:ssZ"},
+	"strict_t_time_no_millis": {"THH:mm:ssZ"},
 
 	// A formatter for a full date as four digit weekyear, two digit week of weekyear, and one digit day of week: xxxx-Www-e.
 	"week_date":        {"xxxx-Www-e"},
 	"strict_week_date": {"xxxx-Www-e"},
 
-	// A formatter that combines a full weekyear date and time, separated by a T: xxxx-Www-eTHH:mm:ss.SSSZZ.
-	"week_date_time":        {"xxxx-Www-eTHH:mm:ss.SSSZZ"},
-	"strict_week_date_time": {"xxxx-Www-eTHH:mm:ss.SSSZZ"},
+	// A formatter that combines a full weekyear date and time, separated by a T: xxxx-Www-eTHH:mm:ss.SSSZ.
+	"week_date_time":        {"xxxx-Www-eTHH:mm:ss.SSSZ"},
+	"strict_week_date_time": {"xxxx-Www-eTHH:mm:ss.SSSZ"},
 
-	// A formatter that combines a full weekyear date and time without millis, separated by a T: xxxx-Www-eTHH:mm:ssZZ.
-	"week_date_time_no_millis":        {"xxxx-Www-eTHH:mm:ssZZ"},
-	"strict_week_date_time_no_millis": {"xxxx-Www-eTHH:mm:ssZZ"},
+	// A formatter that combines a full weekyear date and time without millis, separated by a T: xxxx-Www-eTHH:mm:ssZ.
+	"week_date_time_no_millis":        {"xxxx-Www-eTHH:mm:ssZ"},
+	"strict_week_date_time_no_millis": {"xxxx-Www-eTHH:mm:ssZ"},
 
 	// A formatter for a four digit weekyear: xxxx.
 	"weekyear":        {"xxxx"},
