@@ -31,9 +31,12 @@ func WithTimeZone(timeZone string) DateMathParserOption {
 	return func(p *DateMathParser) error {
 		if loc, err := time.LoadLocation(timeZone); err != nil {
 			var timeOffset = timeZone
-			if t, ok := builtInTimeZone[strings.ToUpper(timeZone)]; ok {
+			if t, ok := abbrevTimeZone[strings.ToUpper(timeZone)]; ok {
+				timeOffset = t
+			} else if t, ok := fullNameTimeZone[strings.ToUpper(timeZone)]; ok {
 				timeOffset = t
 			}
+
 			var s = TimeZoneOffset.FindStringSubmatch(timeOffset)
 			if len(s) != 4 {
 				return fmt.Errorf("time zone: %s format is invalid, expect time offset format: (\\+|-)(\\d{1,2}):(\\d{1,2}) or time zone (abbreviation/full name) or IANA format", timeZone)
