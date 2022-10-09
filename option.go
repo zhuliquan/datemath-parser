@@ -14,7 +14,7 @@ func WithFormat(formats []string) DateMathParserOption {
 	return func(p *DateMathParser) error {
 		var parserFormats = []string{}
 		for _, format := range formats {
-			if jodaFormats, ok := builtInFormat[format]; ok {
+			if jodaFormats, ok := BuiltInFormat[format]; ok {
 				parserFormats = append(parserFormats, jodaFormats...)
 			} else {
 				parserFormats = append(parserFormats, format)

@@ -165,12 +165,16 @@ func TestDateMathParser_format(t *testing.T) {
 	for _, eachCase := range []testCase{
 		{
 			name: "test_format",
-			format: []string{"epoch_millis", "epoch_second", "date_optional_time",
-				"strict_date_optional_time_nanos", "basic_ordinal_date_time_no_millis", "yyyy-DDDTHH"},
+			format: []string{"epoch_millis", "epoch_second",
+				"date_optional_time",
+				"strict_date_optional_time_nanos",
+				"basic_ordinal_date_time_no_millis",
+				"yyyy-DDDTHH"},
 			parser: &DateMathParser{
 				Formats: []string{"epoch_millis", "epoch_second",
+					"yyyy-MM-ddTHH:mm:ss.SSSZ", "yyyy-MM-dd",
 					"yyyy-MM-ddTHH:mm:ss.SSSSSSZ", "yyyy-MM-dd",
-					"yyyy-MM-ddTHH:mm:ss.SSSSSSZ", "yyyy-MM-dd", "yyyyDDDTHHmmssZ", "yyyy-DDDTHH"},
+					"yyyyDDDTHHmmssZ", "yyyy-DDDTHH"},
 			},
 		},
 	} {
