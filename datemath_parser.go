@@ -32,7 +32,9 @@ type DateMathParser struct {
 }
 
 func NewDateMathParser(opts ...DateMathParserOption) (*DateMathParser, error) {
-	var p = &DateMathParser{}
+	var p = &DateMathParser{
+		TimeZone: time.UTC,
+	}
 	for _, opt := range opts {
 		if err := opt(p); err != nil {
 			return nil, err
@@ -76,14 +78,14 @@ func (p *DateMathParser) parseTime(expr string) (time.Time, error) {
 		for _, format := range p.Formats {
 			if format == "epoch_second" {
 				if sec, err := strconv.ParseInt(expr, 10, 64); err != nil {
-					return emptyTime, fmt.Errorf("failed to parse time, expr: %s, format: epoch_second", expr)
-				} else {
+					continue
+				} else if len(expr) <= 10 { // 秒的精度是10位
 					return time.Unix(sec, 0), nil
 				}
 			} else if format == "epoch_millis" {
 				if millis, err := strconv.ParseInt(expr, 10, 64); err != nil {
-					return emptyTime, fmt.Errorf("failed to parse time, expr: %s, format: epoch_millis", expr)
-				} else {
+					continue
+				} else if len(expr) <= 13 { // 毫秒的精度是13位
 					return time.Unix(millis/1000, millis%1000), nil
 				}
 			} else {
@@ -99,18 +101,11 @@ func (p *DateMathParser) parseTime(expr string) (time.Time, error) {
 }
 
 func (p *DateMathParser) parseFormat(expr, format string) (time.Time, error) {
-	if p.TimeZone != nil {
-		return jodaTime.ParseInLocation(format, expr, p.TimeZone.String())
-	} else {
-		return jodaTime.Parse(format, expr)
-	}
+	return jodaTime.ParseInLocation(format, expr, p.TimeZone.String())
 }
 
 func (p *DateMathParser) parseAny(expr string) (time.Time, error) {
-	if p.TimeZone != nil {
-		return dateparse.ParseIn(expr, p.TimeZone)
-	}
-	return dateparse.ParseAny(expr)
+	return dateparse.ParseIn(expr, p.TimeZone)
 }
 
 func (p *DateMathParser) evalDur(dur string, tim time.Time) (time.Time, error) {
