@@ -44,7 +44,7 @@ func NewDateMathParser(opts ...DateMathParserOption) (*DateMathParser, error) {
 func (p *DateMathParser) Parse(expr string) (time.Time, error) {
 	var res time.Time
 	var dur = ""
-	if expr[0:3] == "now" {
+	if len(expr) >= 3 && expr[0:3] == "now" {
 		dur = expr[3:]
 		res = time.Now()
 	} else {
